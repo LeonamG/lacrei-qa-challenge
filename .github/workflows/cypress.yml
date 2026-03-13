@@ -25,6 +25,7 @@ jobs:
           browser: chrome
           spec: cypress/e2e/**/*.feature
           install-command: npm install --legacy-peer-deps --force
+          cache-key: cypress-${{ github.sha }}
         env:
           CYPRESS_userEmail: ${{ secrets.CYPRESS_USER_EMAIL }}
           CYPRESS_userPassword: ${{ secrets.CYPRESS_USER_PASSWORD }}
