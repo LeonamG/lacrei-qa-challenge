@@ -22,7 +22,7 @@ Ferramentas utilizadas no projeto:
 
 - Cypress 15
 - Cucumber (`@badeball/cypress-cucumber-preprocessor`)
-- Google Lighthouse
+- Google Lighthouse + Puppeteer
 
 ### Clonar o repositório
 
@@ -68,7 +68,7 @@ npx cypress run --spec "cypress/e2e/pesquisa.feature"
 | Feature | Cenários | Status |
 |---|---|---|
 | `login.feature` | Login válido e inválido | ✅ Automatizado |
-| `pesquisa.feature` | Busca de profissionais | ✅ Automatizado |
+| `pesquisa.feature` | Busca de profissionais e bug de inconsistência | ✅ Automatizado |
 | `agendamento.feature` | Fluxo E2E completo | ✅ Automatizado |
 
 ### Features não automatizadas (limitação técnica)
@@ -78,6 +78,29 @@ npx cypress run --spec "cypress/e2e/pesquisa.feature"
 | Cadastro de usuário | Requer verificação por e-mail real |
 | Recuperação de senha | Requer acesso a e-mail real |
 | Verificação de telefone (SMS) | Requer código SMS real |
+
+---
+
+## Testes de Performance (Lighthouse)
+
+Executar o relatório de performance:
+
+```bash
+node lighthouse-flow.js
+```
+
+### Resultados obtidos
+
+| Etapa | Performance | Acessibilidade | SEO |
+|---|---|---|---|
+| Página inicial (Login) | 82 | 96 | 82 |
+| Busca de profissionais | 100 | N/A | N/A |
+
+**Análise:**
+- ✅ **Performance 82/100** na página inicial — dentro do aceitável
+- ✅ **Acessibilidade 96/100** — excelente, acima da meta de 90
+- ✅ **Performance 100/100** na busca — resultado excelente
+- ⚠️ **SEO 82/100** — abaixo da meta de 90, recomenda-se melhorias
 
 ---
 
@@ -181,8 +204,9 @@ Possíveis melhorias identificadas:
 ### BUG-004 — Resultados inconsistentes na pesquisa
 - **Impacto:** Médio
 - **Passos:**
-  1. Realizar uma pesquisa → voltar → repetir a busca
-  2. Resultados diferentes são exibidos para a mesma busca
+  1. Buscar por termo válido como "psicologa"
+  2. Nenhum resultado é exibido mesmo com profissionais cadastrados
+- **Esperado:** Resultados exibidos para termos válidos
 
 ---
 
@@ -207,5 +231,7 @@ Após o rollback, os testes rodam automaticamente no CI para validar a estabilid
 # Conclusão
 
 Durante os testes exploratórios foram identificados defeitos relevantes na aplicação, incluindo problemas nos fluxos de agendamento, verificação de SMS e recuperação de senha.
+
+Os testes de performance demonstraram boa pontuação geral, com destaque para acessibilidade (96/100) e performance na busca (100/100). O SEO (82/100) é um ponto de atenção para melhorias futuras.
 
 Esses resultados demonstram a importância da aplicação de testes automatizados e exploratórios para garantir a qualidade da plataforma Lacrei Saúde.
