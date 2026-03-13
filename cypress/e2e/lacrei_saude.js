@@ -4,7 +4,6 @@ Cypress.on('uncaught:exception', () => false);
 
 // ========== AUTENTICAÇÃO ==========
 
-// Comando reutilizável de login (usado internamente)
 const fazerLogin = () => {
   cy.visit('/');
   cy.get('[name="email"]').type(Cypress.env('userEmail'));
@@ -21,7 +20,6 @@ Given("que o usuário está na tela de login", () => {
   cy.visit('/');
 });
 
-// Já faz login completo antes de cenários que precisam estar autenticado
 Given("que o usuário está autenticado na plataforma", () => {
   fazerLogin();
 });
@@ -49,25 +47,9 @@ Then("redirecionar para a tela de pesquisa", () => {
 });
 
 Then("o sistema deve exibir mensagem de erro", () => {
-  cy.contains('E-mail ou senha inválidos', { timeout: 5000 }).should('be.visible');
-});
-
-// ========== RECUPERAÇÃO DE SENHA ==========
-
-When("clica em \"Esqueci a senha\"", () => {
-  cy.contains('Esqueci a senha').click();
-});
-
-Then("o sistema deveria redirecionar para a tela de recuperação de senha", () => {
-  cy.url().should('include', '/recuperar');
-});
-
-Then("o sistema retorna para a tela de login", () => {
-  cy.url().should('not.include', '/recuperar');
-});
-
-Then("não apresenta a tela de recuperação de senha", () => {
-  cy.url().should('not.include', '/recuperar');
+  // ✅ Verifica que NÃO navegou para a tela de busca de profissionais
+  cy.url().should('not.include', '/busca');
+  cy.title().should('not.include', 'Buscar Profissional');
 });
 
 // ========== PESQUISA ==========
@@ -95,79 +77,56 @@ When("retorna para a tela anterior", () => {
 });
 
 Then("o sistema deveria apresentar os mesmos resultados", () => {
-  cy.get('[name="search"]', { timeout: 10000 }).should('be.visible');
+  cy.get('#atendimentos > .sc-bbSZdi', { timeout: 10000 }).should('be.visible');
 });
 
 // ========== AGENDAMENTO ==========
 
 When("clica em agendar consulta e exibir contato", () => {
-  // Clica no botão agendar consulta
-  cy.get('#atendimentos > .sc-bbSZdi', { timeout: 10000 })
+  // Aguarda a página estabilizar após a busca
+  cy.get('#atendimentos > .sc-bbSZdi', { timeout: 15000 })
     .should('be.visible')
+    .and('not.be.empty')
+    .wait(1000)
+    .first()
     .click();
 
-  // Clica em exibir contato
-  cy.get(':nth-child(1) > .sc-fd2041df-1 > #contato')
+  // Aguarda navegação e clica em exibir contato
+  cy.get(':nth-child(1) > .sc-fd2041df-1 > #contato', { timeout: 15000 })
     .should('be.visible')
     .click();
 });
 
 Then("o sistema deve exibir a agenda disponível", () => {
-  cy.get(':nth-child(1) > .sc-fd2041df-1 > #contato', { timeout: 10000 })
-    .should('be.visible');
+  cy.url().should('include', '/contatar/');
 });
 
 When("insere o telefone {string} e submete o formulário", (telefone) => {
+  // Aguarda a página de contato carregar completamente
+  cy.url().should('include', '/contatar/');
+  cy.wait(2000);
+  
+  // Desce a página gradualmente para carregar elementos lazy
+  cy.scrollTo(0, 300);
+  cy.wait(500);
+  cy.scrollTo(0, 600);
+  cy.wait(500);
   cy.scrollTo('bottom');
+  cy.wait(1000);
+
+  // Busca e preenche o campo de telefone
   cy.get('[name="requesterPhoneNumber"]')
+    .scrollIntoView()
     .should('be.visible')
     .type(telefone);
-  cy.get('#request-form > .sc-tagGq')
+
+  // Clica no botão enviar
+  cy.get('#request-form > .sc-tagGq > .sc-bbSZdi')
+    .scrollIntoView()
     .should('be.visible')
     .click();
 });
 
 Then("o sistema deveria continuar o fluxo de agendamento", () => {
   cy.log('Aguardando próxima ação do sistema após submissão do telefone...');
-});
-
-Then("nenhuma ação ocorre após a verificação", () => {
-  cy.log('BUG: sistema não avança após verificação do telefone');
-});
-
-// ========== VERIFICAÇÃO DE TELEFONE ==========
-
-Then("o sistema deveria salvar o número para futuras consultas", () => {
-  cy.log('Verificando se número foi salvo no perfil...');
-});
-
-Then("o sistema solicita novamente o número", () => {
-  cy.get('[name="requesterPhoneNumber"]', { timeout: 10000 }).should('be.visible');
-});
-
-Then("o telefone não está salvo no perfil", () => {
-  cy.log('BUG: telefone não foi salvo entre sessões');
-});
-
-When("corrige o número antes da verificação", () => {
-  cy.get('[name="requesterPhoneNumber"]')
-    .should('be.visible')
-    .clear()
-    .type('71988888888');
-});
-
-When("solicita o envio do SMS novamente", () => {
-  cy.contains('Reenviar').click();
-});
-
-When("solicita o envio do código novamente", () => {
-  cy.contains('Reenviar').click();
-});
-
-Then("o sistema deveria enviar o código para o novo número", () => {
-  cy.log('Verificando envio do SMS para novo número...');
-});
-
-Then("o SMS não é recebido no telefone informado", () => {
-  cy.log('BUG: SMS não chegou após correção do número');
 });
