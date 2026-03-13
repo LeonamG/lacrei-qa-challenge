@@ -17,17 +17,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-
-      - name: Instalar dependências
-        run: npm install --legacy-peer-deps --force
+          node-version: 22
 
       - name: Rodar testes Cypress
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
           spec: cypress/e2e/**/*.feature
-          install: false
+          install-command: npm install --legacy-peer-deps --force
         env:
           CYPRESS_userEmail: ${{ secrets.CYPRESS_USER_EMAIL }}
           CYPRESS_userPassword: ${{ secrets.CYPRESS_USER_PASSWORD }}
