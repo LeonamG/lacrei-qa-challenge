@@ -6,7 +6,7 @@ Feature: Agendamento de consulta
     And clica em entrar
     Then o sistema deve permitir acesso à plataforma
 
-    When realiza uma busca por "são paulo"
+    When realiza uma busca com resultados por "são paulo"
     Then o sistema deve exibir profissionais relacionados à busca
 
     When clica em agendar consulta e exibir contato

@@ -8,10 +8,6 @@ Feature: Pesquisa de profissionais
 
   Scenario: Resultados inconsistentes na pesquisa
     Given que o usuário está autenticado na plataforma
-    When digita um termo de pesquisa
-    And clica na lupa
-    Then o sistema deve exibir profissionais relacionados à busca
-    When retorna para a tela anterior
-    And digita um termo de pesquisa
-    And clica na lupa
-    Then o sistema deveria apresentar os mesmos resultados
+    When realiza uma busca por "psicologa"
+    Then o sistema não deveria exibir resultados
+    But alguns resultados não são exibidos
