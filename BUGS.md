@@ -11,6 +11,7 @@
 - **Impacto:** 🟡 Médio
 - **Tela:** Pesquisa de profissionais
 - **URL:** https://paciente-staging.lacreisaude.com.br/saude/paciente/profissional/busca/
+- **Evidência:** https://github.com/LeonamG/lacrei-qa-challenge/issues/3
 
 **Descrição:**  
 Ao clicar na lupa e realizar uma pesquisa, alguns resultados são exibidos. Porém, ao voltar e realizar a mesma pesquisa novamente, os resultados não aparecem.
@@ -33,6 +34,7 @@ Ao clicar na lupa e realizar uma pesquisa, alguns resultados são exibidos. Por�
 - **Impacto:** 🟡 Médio
 - **Tela:** Resultados da pesquisa
 - **URL:** https://paciente-staging.lacreisaude.com.br/saude/paciente/profissional/busca/
+- **Evidência:** https://github.com/LeonamG/lacrei-qa-challenge/issues/1
 
 **Descrição:**  
 Ao clicar na lupa e carregar os resultados da pesquisa, o layout dos cards de profissionais aparece totalmente desconfigurado em dispositivos móveis.
@@ -54,6 +56,7 @@ Ao clicar na lupa e carregar os resultados da pesquisa, o layout dos cards de pr
 - **Tela:** Resultados da pesquisa
 - **URL:** https://paciente-staging.lacreisaude.com.br/saude/paciente/profissional/busca/
 - **Plataformas:** Web e Mobile
+- **Evidência:** https://github.com/LeonamG/lacrei-qa-challenge/issues/4
 
 **Descrição:**  
 Ao clicar no logo "Lacrei Saúde" no topo da tela de resultados, o comportamento esperado seria retornar à tela de pesquisa, porém nada acontece.
@@ -73,6 +76,7 @@ Ao clicar no logo "Lacrei Saúde" no topo da tela de resultados, o comportamento
 - **Impacto:** 🔴 Crítico
 - **Tela:** Contatar profissional
 - **URL:** https://paciente-staging.lacreisaude.com.br/saude/paciente/profissional/contatar/fe8e578c/?category=presencial
+- **Evidência:** https://github.com/LeonamG/lacrei-qa-challenge/issues/5
 
 **Descrição:**  
 Ao tentar agendar uma consulta, o sistema solicita o número de celular e envia o código SMS. Após inserir o código corretamente e validar, nenhuma ação ocorre — o sistema não avança no fluxo.
@@ -96,6 +100,7 @@ Ao tentar agendar uma consulta, o sistema solicita o número de celular e envia 
 - **Impacto:** 🟡 Médio
 - **Tela:** Contatar profissional
 - **URL:** https://paciente-staging.lacreisaude.com.br/saude/paciente/profissional/contatar/fe8e578c/?category=presencial
+- **Evidência:** https://github.com/LeonamG/lacrei-qa-challenge/issues/6
 
 **Descrição:**  
 Após informar o número de celular durante o agendamento, o sistema não salva esse dado. A cada novo agendamento, o usuário precisa informar o número novamente.
@@ -115,6 +120,7 @@ Após informar o número de celular durante o agendamento, o sistema não salva 
 - **Impacto:** 🟠 Alto
 - **Tela:** Perfil do usuário
 - **URL:** https://paciente-staging.lacreisaude.com.br/perfil/
+- **Evidência:** https://github.com/LeonamG/lacrei-qa-challenge/issues/7
 
 **Descrição:**  
 Não existe um botão ou opção visível para realizar o logout da plataforma. O usuário não consegue encerrar a sessão de forma explícita.
@@ -134,6 +140,7 @@ Não existe um botão ou opção visível para realizar o logout da plataforma. 
 - **Impacto:** 🟠 Alto
 - **Tela:** Perfil do usuário
 - **URL:** https://paciente-staging.lacreisaude.com.br/perfil/
+- **Evidência:** https://github.com/LeonamG/lacrei-qa-challenge/issues/8
 
 **Descrição:**  
 Ao clicar em "Editar dados" na tela de perfil, o sistema não exibe os campos editáveis nem permite qualquer alteração. Não é possível, por exemplo, adicionar ou atualizar o número de celular.
@@ -153,6 +160,7 @@ Ao clicar em "Editar dados" na tela de perfil, o sistema não exibe os campos ed
 - **Impacto:** 🟡 Médio
 - **Tela:** Perfil do usuário
 - **URL:** https://paciente-staging.lacreisaude.com.br/perfil/
+- **Evidência:** https://github.com/LeonamG/lacrei-qa-challenge/issues/2
 
 **Descrição:**  
 Em dispositivos móveis, a tela de perfil apresenta áreas brancas ou pretas que variam conforme o tema do dispositivo (claro ou escuro), indicando problema de responsividade e suporte a temas.
@@ -172,6 +180,7 @@ Em dispositivos móveis, a tela de perfil apresenta áreas brancas ou pretas que
 - **Impacto:** 🔴 Crítico
 - **Tela:** Login
 - **URL:** https://paciente-staging.lacreisaude.com.br/
+- **Evidência:** https://github.com/LeonamG/lacrei-qa-challenge/issues/9
 
 **Descrição:**  
 Ao clicar em "Esqueci a senha", o sistema faz uma transição como se fosse abrir uma nova tela, mas redireciona de volta para a própria tela de login, impedindo o usuário de recuperar a senha.
@@ -188,14 +197,14 @@ Ao clicar em "Esqueci a senha", o sistema faz uma transição como se fosse abri
 
 ## Resumo
 
-| Bug | Descrição | Impacto |
-|---|---|---|
-| BUG-001 | Resultados inconsistentes na pesquisa | 🟡 Médio |
-| BUG-002 | Layout quebrado no mobile após pesquisa | 🟡 Médio |
-| BUG-003 | Logo não navega para tela de pesquisa | 🟡 Médio |
-| BUG-004 | Verificação de telefone trava o agendamento | 🔴 Crítico |
-| BUG-005 | Número de celular não salvo entre sessões | 🟡 Médio |
-| BUG-006 | Ausência de botão de logout | 🟠 Alto |
-| BUG-007 | Edição de perfil não funciona | 🟠 Alto |
-| BUG-008 | Layout com áreas brancas/pretas no mobile | 🟡 Médio |
-| BUG-009 | "Esqueci a senha" retorna para login | 🔴 Crítico |
+| Bug | Descrição | Impacto | Issue |
+|---|---|---|---|
+| BUG-001 | Resultados inconsistentes na pesquisa | 🟡 Médio | [#3](https://github.com/LeonamG/lacrei-qa-challenge/issues/3) |
+| BUG-002 | Layout quebrado no mobile após pesquisa | 🟡 Médio | [#1](https://github.com/LeonamG/lacrei-qa-challenge/issues/1) |
+| BUG-003 | Logo não navega para tela de pesquisa | 🟡 Médio | [#4](https://github.com/LeonamG/lacrei-qa-challenge/issues/4) |
+| BUG-004 | Verificação de telefone trava o agendamento | 🔴 Crítico | [#5](https://github.com/LeonamG/lacrei-qa-challenge/issues/5) |
+| BUG-005 | Número de celular não salvo entre sessões | 🟡 Médio | [#6](https://github.com/LeonamG/lacrei-qa-challenge/issues/6) |
+| BUG-006 | Ausência de botão de logout | 🟠 Alto | [#7](https://github.com/LeonamG/lacrei-qa-challenge/issues/7) |
+| BUG-007 | Edição de perfil não funciona | 🟠 Alto | [#8](https://github.com/LeonamG/lacrei-qa-challenge/issues/8) |
+| BUG-008 | Layout com áreas brancas/pretas no mobile | 🟡 Médio | [#2](https://github.com/LeonamG/lacrei-qa-challenge/issues/2) |
+| BUG-009 | "Esqueci a senha" retorna para login | 🔴 Crítico | [#9](https://github.com/LeonamG/lacrei-qa-challenge/issues/9) |
