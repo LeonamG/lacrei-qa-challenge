@@ -104,6 +104,44 @@ node lighthouse-flow.js
 
 ---
 
+## Testes de Carga (Puppeteer)
+
+Executar o teste de carga definindo o número de usuários simultâneos no topo do arquivo:
+
+```bash
+node load-test.js
+```
+
+### Resultados obtidos (5 usuários simultâneos)
+
+| Usuário | Login (ms) | Submit (ms) | Pesquisa (ms) | Status |
+|---|---|---|---|---|
+| #1 | 2192 | 2773 | 380 | ✅ OK (tentativa 2) |
+| #2 | 1830 | 6643 | 719 | ✅ OK |
+| #3 | 2066 | 6209 | 366 | ✅ OK |
+| #4 | 1980 | 6488 | 403 | ✅ OK (tentativa 2) |
+| #5 | N/A | N/A | N/A | ❌ ERRO (timeout na pesquisa) |
+
+**Resumo:**
+
+| Métrica | Valor |
+|---|---|
+| Usuários simulados | 5 |
+| Sucesso | 4 (80%) |
+| Falha | 1 (20%) |
+| Média login | ~2017ms |
+| Média submit | ~5528ms |
+| Média pesquisa | ~467ms |
+| Duração total | 53.23s |
+
+**Análise:**
+- ⚠️ **3 de 5 usuários** falharam na primeira tentativa — servidor instável sob carga
+- 🔴 **1 de 5 usuários** falhou mesmo com retry — timeout no carregamento dos resultados
+- 🟡 **Submit do login lento** (~5.5s) sob concorrência — degradação perceptível
+- ✅ **Pesquisa rápida** (~467ms) nos casos de sucesso
+
+---
+
 ## Testes Manuais
 
 Os cenários de testes manuais estão documentados utilizando **Gherkin** na pasta `cypress/e2e/`.
@@ -136,7 +174,8 @@ Lacrei_Saude/
 │       ├── pesquisa.feature
 │       └── lacrei_saude.js    # Step definitions
 ├── cypress.config.js
-├── lighthouse-flow.js         # Testes de performance
+├── lighthouse-flow.js         # Testes de performance (Lighthouse)
+├── load-test.js               # Testes de carga (Puppeteer)
 └── package.json
 ```
 
@@ -178,35 +217,20 @@ Possíveis melhorias identificadas:
 
 # 6. Bugs Encontrados
 
-### BUG-001 — Verificação de telefone interrompe fluxo de agendamento
-- **Impacto:** Crítico
-- **Passos:**
-  1. Fazer login → buscar profissional → clicar em agendar
-  2. Inserir número de telefone e submeter
-  3. Nenhuma ação ocorre após a verificação
-- **Esperado:** Sistema continua o fluxo após verificação
-- **Atual:** Tela congela sem feedback
+| Bug | Descrição | Impacto |
+|---|---|---|
+| BUG-001 | Resultados inconsistentes na pesquisa | 🟡 Médio |
+| BUG-002 | Layout quebrado no mobile após pesquisa | 🟡 Médio |
+| BUG-003 | Logo não navega para tela de pesquisa | 🟡 Médio |
+| BUG-004 | Verificação de telefone trava o agendamento | 🔴 Crítico |
+| BUG-005 | Número de celular não salvo entre sessões | 🟡 Médio |
+| BUG-006 | Ausência de botão de logout | 🟠 Alto |
+| BUG-007 | Edição de perfil não funciona | 🟠 Alto |
+| BUG-008 | Layout com áreas brancas/pretas no mobile | 🟡 Médio |
+| BUG-009 | "Esqueci a senha" retorna para login | 🔴 Crítico |
+| BUG-010 | Servidor instável sob carga simultânea | 🔴 Crítico |
 
-### BUG-002 — Número de telefone não é salvo entre sessões
-- **Impacto:** Médio
-- **Passos:**
-  1. Informar número durante agendamento
-  2. Iniciar novo agendamento
-  3. Sistema solicita o número novamente
-- **Esperado:** Número salvo no perfil do usuário
-
-### BUG-003 — SMS não chega após correção do número
-- **Impacto:** Alto
-- **Passos:**
-  1. Digitar número incorreto → corrigir → solicitar reenvio
-  2. SMS não é recebido no número corrigido
-
-### BUG-004 — Resultados inconsistentes na pesquisa
-- **Impacto:** Médio
-- **Passos:**
-  1. Buscar por termo válido como "psicologa"
-  2. Nenhum resultado é exibido mesmo com profissionais cadastrados
-- **Esperado:** Resultados exibidos para termos válidos
+> Detalhamento completo em `BUGS.md`
 
 ---
 
@@ -230,8 +254,8 @@ Após o rollback, os testes rodam automaticamente no CI para validar a estabilid
 
 # Conclusão
 
-Durante os testes exploratórios foram identificados defeitos relevantes na aplicação, incluindo problemas nos fluxos de agendamento, verificação de SMS e recuperação de senha.
+Durante os testes exploratórios e automatizados foram identificados **10 defeitos** na aplicação, incluindo problemas críticos nos fluxos de agendamento, recuperação de senha e instabilidade do servidor sob carga simultânea.
 
-Os testes de performance demonstraram boa pontuação geral, com destaque para acessibilidade (96/100) e performance na busca (100/100). O SEO (82/100) é um ponto de atenção para melhorias futuras.
+Os testes de performance demonstraram boa pontuação geral, com destaque para acessibilidade (96/100) e performance na busca (100/100). O SEO (82/100) e a instabilidade sob carga (80% de sucesso com 5 usuários simultâneos) são pontos de atenção para melhorias futuras.
 
-Esses resultados demonstram a importância da aplicação de testes automatizados e exploratórios para garantir a qualidade da plataforma Lacrei Saúde.
+Esses resultados demonstram a importância da aplicação de testes automatizados, exploratórios e de carga para garantir a qualidade da plataforma Lacrei Saúde.

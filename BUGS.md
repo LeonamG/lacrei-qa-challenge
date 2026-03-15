@@ -208,3 +208,32 @@ Ao clicar em "Esqueci a senha", o sistema faz uma transição como se fosse abri
 | BUG-007 | Edição de perfil não funciona | 🟠 Alto | [#8](https://github.com/LeonamG/lacrei-qa-challenge/issues/8) |
 | BUG-008 | Layout com áreas brancas/pretas no mobile | 🟡 Médio | [#2](https://github.com/LeonamG/lacrei-qa-challenge/issues/2) |
 | BUG-009 | "Esqueci a senha" retorna para login | 🔴 Crítico | [#9](https://github.com/LeonamG/lacrei-qa-challenge/issues/9) |
+
+---
+
+## BUG-010 — Servidor instável sob carga simultânea de usuários
+
+- **Impacto:** 🔴 Crítico
+- **Tela:** Pesquisa de profissionais
+- **URL:** https://paciente-staging.lacreisaude.com.br/saude/paciente/profissional/busca/
+
+**Descrição:**  
+Durante teste de carga com 5 usuários simultâneos, o servidor apresentou instabilidade severa. 3 de 5 usuários falharam na primeira tentativa e 1 de 5 falhou mesmo com retry, indicando que a aplicação não suporta concorrência mínima de usuários.
+
+**Passos para reprodução:**
+1. Executar `node load-test.js` com 5 ou mais usuários simultâneos
+2. Observar falhas de timeout no seletor `#atendimentos > .sc-bbSZdi`
+3. Observar degradação no tempo de submit do login (~5.5s sob carga vs ~2.5s isolado)
+
+**Resultados do teste (5 usuários simultâneos):**
+
+| Métrica | Valor |
+|---|---|
+| Taxa de sucesso | 80% (4/5) |
+| Falhas na 1ª tentativa | 3/5 (60%) |
+| Média submit sob carga | ~5528ms |
+| Média submit isolado | ~2500ms |
+| Degradação | ~120% mais lento |
+
+**Esperado:** Servidor deve suportar pelo menos 10 usuários simultâneos sem falhas  
+**Atual:** Falhas com apenas 5 usuários simultâneos, timeout no carregamento de resultados
