@@ -41,35 +41,37 @@ npm install --legacy-peer-deps
 
 # 2. Como Executar os Testes
 
-## Testes Automatizados
+## Testes Automatizados (Cypress)
 
-Abrir interface do Cypress:
+### Interface gráfica (GUI)
+Para executar os testes com interface visual, acompanhando cada passo em tempo real no navegador:
 
 ```bash
 npx cypress open
 ```
 
-Executar testes em modo headless:
+### Linha de comando (headless)
+Para executar os testes via terminal, sem abrir o navegador — ideal para CI/CD:
 
 ```bash
 npx cypress run
 ```
 
-Executar uma feature específica:
+### Executar uma feature específica
 
 ```bash
-npx cypress run --spec "cypress/e2e/login.feature"
-npx cypress run --spec "cypress/e2e/agendamento.feature"
-npx cypress run --spec "cypress/e2e/pesquisa.feature"
+npx cypress run --spec "cypress/e2e/feature/login.feature"
+npx cypress run --spec "cypress/e2e/feature/pesquisa.feature"
+npx cypress run --spec "cypress/e2e/feature/agendamento.feature"
 ```
 
 ### Features automatizadas
 
 | Feature | Cenários | Status |
 |---|---|---|
-| `login.feature` | Login válido e inválido | ✅ Automatizado |
-| `pesquisa.feature` | Busca de profissionais e bug de inconsistência | ✅ Automatizado |
-| `agendamento.feature` | Fluxo E2E completo | ✅ Automatizado |
+| `login.feature` | Login válido, inválido, campos vazios, email inválido | ✅ Automatizado |
+| `pesquisa.feature` | Busca válida, inconsistência, campo vazio, caracteres especiais | ✅ Automatizado |
+| `agendamento.feature` | Fluxo E2E, telefone inválido, campo vazio | ✅ Automatizado |
 
 ### Features não automatizadas (limitação técnica)
 
@@ -144,7 +146,7 @@ node load-test.js
 
 ## Testes Manuais
 
-Os cenários de testes manuais estão documentados utilizando **Gherkin** na pasta `cypress/e2e/`.
+Os cenários de testes manuais estão documentados utilizando **Gherkin** na pasta `cypress/e2e/feature/`.
 
 Exemplo de cenário:
 
@@ -160,28 +162,61 @@ Feature: Pesquisa de profissionais
 
 ---
 
-# 3. Organização da Documentação
+# 3. Arquitetura da Automação
+
+Os testes seguem o padrão **Page Object Model (POM)**, separando responsabilidades em três camadas:
+
+- **Feature files** — cenários escritos em Gherkin (linguagem natural), descrevem o comportamento esperado
+- **Step definitions** — conectam os cenários Gherkin ao código Cypress, chamando métodos das Pages
+- **Page Objects** — encapsulam os seletores e ações de cada tela, tornando os testes reutilizáveis e fáceis de manter
+
+### Fluxo de execução
+
+```
+pesquisa.feature
+      ↓
+pesquisa.steps.js   (When "realiza uma busca por...")
+      ↓
+PesquisaPage.js     (searchFor(), shouldShowResults()...)
+      ↓
+Cypress               (cy.get(), cy.type(), cy.click()...)
+      ↓
+Aplicação Lacrei Saúde
+```
+
+---
+
+# 4. Organização do Repositório
 
 ```
 Lacrei_Saude/
 ├── .github/
 │   └── workflows/
-│       └── cypress.yml        # Pipeline CI/CD
+│       └── cypress.yml              # Pipeline CI/CD
 ├── cypress/
 │   └── e2e/
-│       ├── agendamento.feature
-│       ├── login.feature
-│       ├── pesquisa.feature
-│       └── lacrei_saude.js    # Step definitions
+│       ├── feature/                 # Cenários em Gherkin (BDD)
+│       │   ├── agendamento.feature
+│       │   ├── login.feature
+│       │   └── pesquisa.feature
+│       ├── pages/                   # Page Objects (seletores e ações)
+│       │   ├── AgendamentoPage.js
+│       │   ├── LoginPage.js
+│       │   └── PesquisaPage.js
+│       └── steps/                   # Step definitions (Gherkin → Cypress)
+│           ├── agendamento.steps.js
+│           ├── login.steps.js
+│           └── pesquisa.steps.js
 ├── cypress.config.js
-├── lighthouse-flow.js         # Testes de performance (Lighthouse)
-├── load-test.js               # Testes de carga (Puppeteer)
+├── lighthouse-flow.js               # Testes de performance (Lighthouse)
+├── load-test.js                     # Testes de carga (Puppeteer)
+├── BUGS.md                          # Registro detalhado de bugs
 └── package.json
 ```
 
 ---
 
-# 4. Pipeline CI/CD
+# 5. Pipeline CI/CD
 
 Os testes rodam automaticamente a cada **commit** e **Pull Request** via GitHub Actions.
 
@@ -194,7 +229,7 @@ Para configurar as credenciais no CI:
 
 ---
 
-# 5. Checklist de Segurança Aplicado
+# 6. Checklist de Segurança Aplicado
 
 Durante a execução dos testes foram verificados os seguintes pontos básicos de segurança:
 
@@ -215,7 +250,7 @@ Possíveis melhorias identificadas:
 
 ---
 
-# 6. Bugs Encontrados
+# 7. Bugs Encontrados
 
 | Bug | Descrição | Impacto |
 |---|---|---|
@@ -234,7 +269,7 @@ Possíveis melhorias identificadas:
 
 ---
 
-# 7. Processo de Rollback dos Testes Automatizados
+# 8. Processo de Rollback dos Testes Automatizados
 
 Caso um teste automatizado apresente falha após uma atualização:
 

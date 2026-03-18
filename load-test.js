@@ -1,50 +1,46 @@
 import puppeteer from 'puppeteer';
 
-// ============================================================
-//  CONFIGURAÇÃO — edite aqui antes de rodar
-// ============================================================
+// altere para quantos usuarios que irá ter no testes
 const CONFIG = {
-  usuarios: 5,          // quantos usuários simultâneos simular
-  delayEntreUsuarios: 1000, // ms de espera entre cada usuário iniciar (evita sobrecarga)
-  tentativas: 2,        // quantas vezes tentar em caso de erro
+  usuarios: 10,          // quantos usuários simultâneos simular
   baseUrl: 'https://paciente-staging.lacreisaude.com.br',
   email: 'qa.testes.leonam@gmail.com',
   senha: 'LEONAMcs@1',
   termoBusca: 'São Paulo',
 };
-// ============================================================
 
-const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
-async function tentarSimular(id) {
+async function simularUsuario(id) {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
   const tempos = { usuario: id };
-  const t = () => Date.now();
+  const t = (label) => ({ label, inicio: Date.now() });
+  const encerrar = (timer) => ({ ...timer, ms: Date.now() - timer.inicio });
 
   try {
     // 1. Carregar página de login
-    let inicio = t();
-    await page.goto(CONFIG.baseUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-    tempos.login_carregamento = t() - inicio;
+    let timer = t('login_carregamento');
+    await page.goto(CONFIG.baseUrl, { waitUntil: 'networkidle2' });
+    tempos.login_carregamento = encerrar(timer).ms;
 
     // 2. Fazer login
-    inicio = t();
+    timer = t('login_submit');
     await page.type('[name="email"]', CONFIG.email);
     await page.type('[name="password"]', CONFIG.senha);
     await page.click('button ::-p-text(Entrar)');
-    await page.waitForSelector('[name="search"]', { visible: true, timeout: 30000 });
-    tempos.login_submit = t() - inicio;
+    await page.waitForSelector('[name="search"]', { visible: true, timeout: 15000 });
+    tempos.login_submit = encerrar(timer).ms;
 
     // 3. Pesquisar profissional
-    inicio = t();
+    timer = t('pesquisa');
     await page.type('[name="search"]', CONFIG.termoBusca);
     await page.keyboard.press('Enter');
-    await page.waitForSelector('#atendimentos > .sc-bbSZdi', { timeout: 30000 });
-    tempos.pesquisa = t() - inicio;
+    await page.waitForSelector('#atendimentos > .sc-bbSZdi', { timeout: 15000 });
+    tempos.pesquisa = encerrar(timer).ms;
 
     tempos.status = '✅ OK';
+  } catch (err) {
+    tempos.status = `❌ ERRO: ${err.message.slice(0, 80)}`;
   } finally {
     await browser.close();
   }
@@ -52,33 +48,15 @@ async function tentarSimular(id) {
   return tempos;
 }
 
-async function simularUsuario(id) {
-  for (let tentativa = 1; tentativa <= CONFIG.tentativas; tentativa++) {
-    try {
-      const resultado = await tentarSimular(id);
-      if (tentativa > 1) resultado.status = `✅ OK (tentativa ${tentativa})`;
-      return resultado;
-    } catch (err) {
-      if (tentativa === CONFIG.tentativas) {
-        return { usuario: id, status: `❌ ERRO: ${err.message.slice(0, 80)}` };
-      }
-      console.log(`  ⚠️  Usuário #${id} falhou na tentativa ${tentativa}, tentando novamente...`);
-      await sleep(2000);
-    }
-  }
-}
-
 async function rodarTeste() {
-  console.log(`\n🚀 Iniciando teste de carga com ${CONFIG.usuarios} usuário(s)...`);
-  console.log(`   Delay entre usuários: ${CONFIG.delayEntreUsuarios}ms | Tentativas: ${CONFIG.tentativas}\n`);
+  console.log(`\n🚀 Iniciando teste de carga com ${CONFIG.usuarios} usuário(s) simultâneo(s)...\n`);
 
   const inicio = Date.now();
 
-  // Dispara usuários com delay escalonado para não sobrecarregar o servidor
-  const promises = Array.from({ length: CONFIG.usuarios }, async (_, i) => {
-    await sleep(i * CONFIG.delayEntreUsuarios);
-    return simularUsuario(i + 1);
-  });
+  // Dispara todos os usuários ao mesmo tempo
+  const promises = Array.from({ length: CONFIG.usuarios }, (_, i) =>
+    simularUsuario(i + 1)
+  );
 
   const resultados = await Promise.all(promises);
   const duracaoTotal = ((Date.now() - inicio) / 1000).toFixed(2);
@@ -96,7 +74,7 @@ async function rodarTeste() {
   );
 
   // Calcula médias apenas dos que passaram
-  const ok = resultados.filter(r => r.status?.startsWith('✅'));
+  const ok = resultados.filter(r => r.status === '✅ OK');
   const media = (campo) =>
     ok.length
       ? Math.round(ok.reduce((s, r) => s + (r[campo] || 0), 0) / ok.length)
